@@ -1,0 +1,59 @@
+import pandas as pd
+#Load the dataset
+data = pd.read_csv('diabetes.csv')
+#Display the first few rows
+print("Dataset Overview:")
+print(data.head())
+#Dataset structure
+print("\nDataset Info:")
+print(data.info())
+#Basic statistics
+print("\nDataset Description:")
+print(data.describe())
+from sklearn.model_selection import train_test_split
+# Features (x) and target (y)
+x= data.drop('Outcome', axis=1)  #Drop the 'Outcome' column for features
+y = data['Outcome']  #Target variable
+# Split the dataset into training and testing sets 
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=42)
+print(f"Training set size: {x_train.shape}")
+print(f"Testing set size: {x_test.shape}")
+from sklearn.linear_model import LogisticRegression
+# Initialize the logistic regression model
+model = LogisticRegression(max_iter=1000)
+# Train the model using the training data
+model.fit(x_train, y_train)
+# Evaluate the model on the testimg data
+accuracy = model.score(x_test, y_test)
+print(f"LogisticRegression Model Accuracy: {accuracy:2f}") 
+from sklearn.metrics import classification_report, confusion_matrix
+import seaborn as sns
+import matplotlib.pyplot as plt
+# Predictions on the test data
+y_pred = model.predict(x_test)
+# Confusion matrix
+cm = confusion_matrix(y_test, y_pred)
+sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')
+plt.title('Confusion Matrix')
+plt.xlabel('Predicted')
+plt.ylabel('Actual')
+plt.show()
+# Classification report
+print("\nClassification Report:")
+print(classification_report(y_test, y_pred))
+from sklearn.model_selection import GridSearchCV
+param_grid = {'C': [0.1, 1, 10], 'penalty': ['l1', 'l2']}
+grid_search = GridSearchCV(estimator=LogisticRegression(), param_grid=param_grid, cv=5)
+grid_search.fit(x_train, y_train)
+best_model = grid_search.best_estimator_
+from sklearn.linear_model import LogisticRegression
+model = LogisticRegression(max_iter=1000)    #Incfrease max_iter to 1000
+model.fit(x_train, y_train)
+from sklearn.preprocessing import StandardScaler
+scaler = StandardScaler()
+x_train_scaled = scaler.fit_transform(x_train)
+x_test_scaled = scaler.transform(x_test)
+model = LogisticRegression(solver='liblinear')
+model.fit(x_train_scaled, y_train)
+model = LogisticRegression(C=0.1)   #Decrease C for stronger regularization
+model.fit(x_train_scaled, y_train)
